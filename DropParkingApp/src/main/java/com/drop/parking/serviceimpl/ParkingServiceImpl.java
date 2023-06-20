@@ -5,17 +5,22 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import com.drop.parking.dto.AuthRequest;
 import com.drop.parking.dto.ParkDto;
 import com.drop.parking.dto.SlotDto;
 import com.drop.parking.dto.UnparkDto;
+import com.drop.parking.dto.UserDto;
 import com.drop.parking.entity.Parking;
 import com.drop.parking.entity.ParkingSlot;
 import com.drop.parking.exceptions.ParkingException;
 import com.drop.parking.repository.ParkingRepository;
 import com.drop.parking.repository.ParkingSlotRepository;
 import com.drop.parking.service.ParkingService;
+import com.drop.parking.util.JwtUtil;
 
 /**
  * Service Implementation
@@ -31,6 +36,12 @@ public class ParkingServiceImpl implements ParkingService {
 
 	@Autowired
 	private ParkingRepository parkingRepository;
+	
+	@Autowired 
+	JwtUtil jwtUtil;
+	
+	@Autowired
+	AuthenticationManager authenticationManager;
 
 	@Value("${parking.lot.size}")
 	private Integer parkingSlotSize;
@@ -114,6 +125,20 @@ public class ParkingServiceImpl implements ParkingService {
 			throw new ParkingException("406", "Car not Found.");
 		}
 
+	}
+
+	@Override
+	public UserDto login(AuthRequest authRequest) {
+		try {
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUserName(),authRequest.getPassword()));
+		}catch(Exception e) {
+			throw new ParkingException("401", "Invalid username/password");
+		}
+		String token = jwtUtil.generateToken(authRequest.getUserName());
+		UserDto userDto = new UserDto();
+		userDto.setAuthenticationToken(token);
+		userDto.setUsername(authRequest.getUserName());
+		return userDto;
 	}
 
 }

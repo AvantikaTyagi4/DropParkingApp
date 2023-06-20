@@ -5,6 +5,12 @@ import org.springframework.stereotype.Repository;
 
 import com.drop.parking.entity.Parking;
 
+/**
+ * Repository for Interacting with Parking Entity
+ * 
+ * @author Avantika Tyagi
+ *
+ */
 @Repository
 public interface ParkingRepository extends JpaRepository<Parking, Long> {
 
