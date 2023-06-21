@@ -59,7 +59,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.and().exceptionHandling().and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-		;
+		
 	}
+
+  @Override
+  public void configure(WebSecurity web) throws Exception {
+      web.ignoring()
+              .antMatchers("/v2/api-docs")
+              .antMatchers("/swagger-ui.html")
+              .antMatchers("/swagger-resources/**")
+              .antMatchers("/webjars/**")
+              .antMatchers("/configuration/ui");
+      
+  }
 
 }
